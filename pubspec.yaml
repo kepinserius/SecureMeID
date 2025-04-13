@@ -53,6 +53,9 @@ dependencies:
   permission_handler: ^10.4.3
   camera: ^0.10.5+2
   file_picker: ^5.3.3
+  bip39: ^1.0.6
+  web3dart: ^2.6.1
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
   flutter_test:
