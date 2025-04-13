@@ -53,7 +53,8 @@ class IPFSService extends ChangeNotifier {
       if (encryptionKey != null) {
         // Convert bytes to base64 string for encryption
         final base64Content = base64Encode(bytes);
-        content = _encryptionService.encryptData(base64Content, encryptionKey);
+        content =
+            await _encryptionService.encryptData(base64Content, encryptionKey);
       } else {
         content = base64Encode(bytes);
       }
@@ -75,7 +76,7 @@ class IPFSService extends ChangeNotifier {
     try {
       // Encrypt data if encryption key is provided
       final content = encryptionKey != null
-          ? _encryptionService.encryptData(data, encryptionKey)
+          ? await _encryptionService.encryptData(data, encryptionKey)
           : data;
 
       // In a real implementation, you would upload to IPFS here
@@ -104,7 +105,8 @@ class IPFSService extends ChangeNotifier {
       // Decrypt content if decryption key is provided
       String dataString;
       if (decryptionKey != null) {
-        dataString = _encryptionService.decryptData(content, decryptionKey);
+        dataString =
+            await _encryptionService.decryptData(content, decryptionKey);
       } else {
         dataString = content;
       }
@@ -130,7 +132,7 @@ class IPFSService extends ChangeNotifier {
 
       // Decrypt content if decryption key is provided
       if (decryptionKey != null) {
-        return _encryptionService.decryptData(content, decryptionKey);
+        return await _encryptionService.decryptData(content, decryptionKey);
       } else {
         return content;
       }

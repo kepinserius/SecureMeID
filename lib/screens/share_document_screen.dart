@@ -8,7 +8,7 @@ import 'package:secureme_id/widgets/pin_input.dart';
 
 class ShareDocumentScreen extends StatefulWidget {
   final Document document;
-  
+
   const ShareDocumentScreen({
     Key? key,
     required this.document,
@@ -29,54 +29,57 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
     super.initState();
     _initializeFieldSelection();
   }
-  
+
   void _initializeFieldSelection() {
     // Default all fields to selected
     setState(() {
       // Add basic document fields
       _selectedFields['document_type'] = true;
       _selectedFields['document_name'] = true;
-      
+
       // Add all metadata fields
-      for (final key in widget.document.metadata.keys) {
-        _selectedFields[key] = true;
+      if (widget.document.metadata != null) {
+        for (final key in widget.document.metadata!.keys) {
+          _selectedFields[key] = true;
+        }
       }
     });
   }
-  
+
   Future<void> _generateToken(String pin) async {
     if (_isLoading) return;
-    
+
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
-      final documentService = Provider.of<DocumentService>(context, listen: false);
-      
+      final documentService =
+          Provider.of<DocumentService>(context, listen: false);
+
       // Get only the selected fields
       final List<String> fieldsToShare = _selectedFields.entries
           .where((entry) => entry.value)
           .map((entry) => entry.key)
           .toList();
-      
+
       // Generate token
+      final String documentId = widget.document.id;
+      final int expiryInSeconds =
+          _expiryTime * 60; // Convert minutes to seconds
+
       final result = await documentService.generateVerificationToken(
-        documentId: widget.document.id,
-        pin: pin,
-        expiryInMinutes: _expiryTime,
-        fieldsToShare: fieldsToShare,
-      );
-      
+          documentId, fieldsToShare, expiryInSeconds);
+
       setState(() {
-        _tokenCid = result['tokenCid'];
+        _tokenCid = result['token']; // Adjust to match actual result key
         _isLoading = false;
       });
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -87,7 +90,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
       }
     }
   }
-  
+
   void _showPinDialog() {
     showDialog(
       context: context,
@@ -116,7 +119,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
       ),
     );
   }
-  
+
   void _copyToClipboard(String text) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -129,8 +132,9 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String documentTypeName = DocumentType.getDisplayName(widget.document.type);
-    
+    final String documentTypeName =
+        DocumentType.getDisplayName(widget.document.type);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Share Document'),
@@ -153,7 +157,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryColor.withOpacity(0.1),
+                        color: AppTheme.primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -186,7 +190,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.1),
+                                color: Colors.green.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: const Text(
@@ -207,7 +211,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Select fields to share
             Text(
               'Select Information to Share',
@@ -219,7 +223,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
               style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 16),
-            
+
             // Basic document fields
             _buildCheckboxTile(
               'Document Type',
@@ -229,26 +233,27 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
               'Document Name',
               'document_name',
             ),
-            
+
             // Divider
             const Divider(height: 32),
-            
+
             // Metadata fields
-            if (widget.document.metadata.isNotEmpty) ...[
+            if (widget.document.metadata != null &&
+                widget.document.metadata!.isNotEmpty) ...[
               Text(
                 'Document Metadata',
                 style: AppTheme.subheadingStyle,
               ),
               const SizedBox(height: 16),
-              ...widget.document.metadata.keys.map((key) => 
-                _buildCheckboxTile(
+              ...widget.document.metadata!.keys.map(
+                (key) => _buildCheckboxTile(
                   key,
                   key,
                 ),
               ),
               const Divider(height: 32),
             ],
-            
+
             // Expiry time
             Text(
               'Token Expiry Time',
@@ -276,7 +281,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Generate token button
             if (_tokenCid == null)
               SizedBox(
@@ -295,14 +300,14 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
                       : const Text('Generate Sharing Token'),
                 ),
               ),
-            
+
             // Show token result
             if (_tokenCid != null) ...[
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                color: AppTheme.primaryColor.withOpacity(0.1),
+                color: AppTheme.primaryColor.withValues(alpha: 0.1),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -326,7 +331,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Row(
@@ -378,7 +383,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
       ),
     );
   }
-  
+
   Widget _buildCheckboxTile(String label, String field) {
     return CheckboxListTile(
       title: Text(label),
@@ -392,7 +397,7 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
       dense: true,
     );
   }
-  
+
   IconData _getDocumentIcon(String documentType) {
     switch (documentType) {
       case DocumentType.idCard:
@@ -421,4 +426,4 @@ class _ShareDocumentScreenState extends State<ShareDocumentScreen> {
         return Icons.description;
     }
   }
-} 
+}

@@ -1,17 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:secureme_id/models/document_model.dart';
 import 'package:secureme_id/screens/share_document_screen.dart';
-import 'package:secureme_id/services/auth_service.dart';
 import 'package:secureme_id/services/document_service.dart';
 import 'package:secureme_id/utils/app_theme.dart';
 import 'package:secureme_id/widgets/pin_input.dart';
 
 class DocumentDetailScreen extends StatefulWidget {
   final Document document;
-  
+
   const DocumentDetailScreen({
     Key? key,
     required this.document,
@@ -25,11 +23,12 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
   bool _isLoading = false;
   bool _showDocumentPreview = false;
   File? _documentFile;
-  
+
   @override
   Widget build(BuildContext context) {
-    final String documentTypeName = DocumentType.getDisplayName(widget.document.type);
-    
+    final String documentTypeName =
+        DocumentType.getDisplayName(widget.document.type);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.document.name),
@@ -80,7 +79,7 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
                         width: double.infinity,
                         height: 200,
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryColor.withOpacity(0.1),
+                          color: AppTheme.primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
@@ -108,7 +107,7 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Document info
             Text(
               'Document Information',
@@ -118,44 +117,57 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
             _buildInfoRow('Name', widget.document.name),
             _buildInfoRow('Type', documentTypeName),
             _buildInfoRow('Date Added', _formatDate(widget.document.createdAt)),
-            _buildInfoRow('Status', widget.document.isVerified ? 'Verified' : 'Unverified'),
-            if (widget.document.isVerified && widget.document.verifiedAt != null)
-              _buildInfoRow('Verified On', _formatDate(widget.document.verifiedAt!)),
-            if (widget.document.isVerified && widget.document.verifiedBy != null)
-              _buildInfoRow('Verified By', _shortenAddress(widget.document.verifiedBy!)),
-            
+            _buildInfoRow('Status',
+                widget.document.isVerified ? 'Verified' : 'Unverified'),
+            if (widget.document.isVerified &&
+                widget.document.verifiedAt != null)
+              _buildInfoRow(
+                  'Verified On', _formatDate(widget.document.verifiedAt!)),
+            if (widget.document.isVerified &&
+                widget.document.verifiedBy != null)
+              _buildInfoRow(
+                  'Verified By', _shortenAddress(widget.document.verifiedBy!)),
+
             const SizedBox(height: 24),
-            
+
             // Document metadata
             Text(
               'Document Metadata',
               style: AppTheme.subheadingStyle,
             ),
             const SizedBox(height: 16),
-            if (widget.document.metadata.isEmpty)
+            if (widget.document.metadata == null ||
+                widget.document.metadata!.isEmpty)
               const Text('No metadata available'),
-            ...widget.document.metadata.entries.map((entry) => 
-              _buildInfoRow(entry.key, entry.value.toString())
-            ),
-            
+            if (widget.document.metadata != null)
+              ...widget.document.metadata!.entries.map(
+                  (entry) => _buildInfoRow(entry.key, entry.value.toString())),
+
             const SizedBox(height: 24),
-            
+
             // Blockchain info
             Text(
               'Blockchain Information',
               style: AppTheme.subheadingStyle,
             ),
             const SizedBox(height: 16),
-            _buildInfoRow('Document Hash', _shortenHash(widget.document.hash)),
-            _buildInfoRow('IPFS CID', _shortenHash(widget.document.ipfsCid)),
-            if (widget.document.txHash.isNotEmpty)
-              _buildInfoRow('Transaction Hash', _shortenHash(widget.document.txHash)),
+            _buildInfoRow(
+                'Document Hash',
+                _shortenHash(
+                    Object.hash(widget.document.id, widget.document.name)
+                        .toString())),
+            if (widget.document.ipfsCid != null)
+              _buildInfoRow('IPFS CID', _shortenHash(widget.document.ipfsCid!)),
+            if (widget.document.txHash != null &&
+                widget.document.txHash!.isNotEmpty)
+              _buildInfoRow(
+                  'Transaction Hash', _shortenHash(widget.document.txHash!)),
           ],
         ),
       ),
     );
   }
-  
+
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -184,21 +196,21 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
       ),
     );
   }
-  
+
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
-  
+
   String _shortenAddress(String address) {
     if (address.length <= 14) return address;
     return '${address.substring(0, 6)}...${address.substring(address.length - 6)}';
   }
-  
+
   String _shortenHash(String hash) {
     if (hash.length <= 14) return hash;
     return '${hash.substring(0, 6)}...${hash.substring(hash.length - 6)}';
   }
-  
+
   IconData _getDocumentIcon(String documentType) {
     switch (documentType) {
       case DocumentType.idCard:
@@ -227,7 +239,7 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
         return Icons.description;
     }
   }
-  
+
   void _showDocument() {
     showDialog(
       context: context,
@@ -256,26 +268,27 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
       ),
     );
   }
-  
+
   Future<void> _decryptAndShowDocument(String pin) async {
     if (_isLoading) return;
-    
+
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
-      final documentService = Provider.of<DocumentService>(context, listen: false);
-      
+      final documentService =
+          Provider.of<DocumentService>(context, listen: false);
+
       // Create a temporary filename for the document
       final filename = 'document_${widget.document.id}.jpg';
-      
+
       final file = await documentService.getDocumentFile(
         widget.document.id,
         pin,
         filename,
       );
-      
+
       setState(() {
         _documentFile = file;
         _showDocumentPreview = true;
@@ -285,7 +298,7 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
       setState(() {
         _isLoading = false;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -296,7 +309,7 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
       }
     }
   }
-  
+
   void _navigateToShare() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -304,7 +317,7 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
       ),
     );
   }
-  
+
   void _handleMenuItemSelected(String value) {
     switch (value) {
       case 'edit':
@@ -315,11 +328,11 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
         break;
     }
   }
-  
+
   void _editMetadata() {
     // Implement metadata editing
   }
-  
+
   void _deleteDocument() {
     showDialog(
       context: context,
@@ -336,10 +349,12 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
           TextButton(
             onPressed: () async {
               Navigator.of(context).pop();
-              
-              final documentService = Provider.of<DocumentService>(context, listen: false);
-              final success = await documentService.deleteDocument(widget.document.id);
-              
+
+              final documentService =
+                  Provider.of<DocumentService>(context, listen: false);
+              final success =
+                  await documentService.deleteDocument(widget.document.id);
+
               if (success && mounted) {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -358,4 +373,4 @@ class _DocumentDetailScreenState extends State<DocumentDetailScreen> {
       ),
     );
   }
-} 
+}

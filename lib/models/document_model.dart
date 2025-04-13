@@ -13,6 +13,7 @@ class DocumentType {
   static const String medicalRecord = 'medicalRecord';
   static const String educationCertificate = 'educationCertificate';
   static const String marriageCertificate = 'marriageCertificate';
+  static const String other = 'other'; // Menambahkan tipe other
 
   /// Mendapatkan nama tampilan untuk tipe dokumen
   static String getDisplayName(String type) {
@@ -75,6 +76,9 @@ class Document {
   DateTime updatedAt;
   String? ipfsCid; // IPFS Content ID untuk data terenkripsi
   String? principalId; // Internet Computer principal ID (pemilik)
+  Map<String, dynamic>? metadata; // Metadata tambahan
+  String? txHash; // Transaction hash dari blockchain
+  String? owner; // Pemilik dokumen
 
   Document({
     required this.id,
@@ -88,6 +92,9 @@ class Document {
     DateTime? updatedAt,
     this.ipfsCid,
     this.principalId,
+    this.metadata,
+    this.txHash,
+    this.owner,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
@@ -115,6 +122,9 @@ class Document {
       'updatedAt': updatedAt.millisecondsSinceEpoch,
       'ipfsCid': ipfsCid,
       'principalId': principalId,
+      'metadata': metadata,
+      'txHash': txHash,
+      'owner': owner,
     };
   }
 
@@ -138,6 +148,9 @@ class Document {
           : DateTime.now(),
       ipfsCid: json['ipfsCid'],
       principalId: json['principalId'],
+      metadata: json['metadata'],
+      txHash: json['txHash'],
+      owner: json['owner'],
     );
   }
 
@@ -149,6 +162,41 @@ class Document {
   /// Mendapatkan string JSON dari dokumen
   String toJsonString() {
     return jsonEncode(toJson());
+  }
+
+  /// Membuat salinan dokumen dengan beberapa properti yang diubah
+  Document copyWith({
+    String? id,
+    String? name,
+    String? type,
+    Map<String, dynamic>? fields,
+    bool? isVerified,
+    String? verifiedBy,
+    DateTime? verifiedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? ipfsCid,
+    String? principalId,
+    Map<String, dynamic>? metadata,
+    String? txHash,
+    String? owner,
+  }) {
+    return Document(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      fields: fields ?? this.fields,
+      isVerified: isVerified ?? this.isVerified,
+      verifiedBy: verifiedBy ?? this.verifiedBy,
+      verifiedAt: verifiedAt ?? this.verifiedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      ipfsCid: ipfsCid ?? this.ipfsCid,
+      principalId: principalId ?? this.principalId,
+      metadata: metadata ?? this.metadata,
+      txHash: txHash ?? this.txHash,
+      owner: owner ?? this.owner,
+    );
   }
 }
 
@@ -198,4 +246,4 @@ class DocumentToken {
       expiryTime: DateTime.fromMillisecondsSinceEpoch(json['expiryTime']),
     );
   }
-} 
+}

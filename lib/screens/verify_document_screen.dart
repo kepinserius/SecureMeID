@@ -43,10 +43,11 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
     });
 
     try {
-      final documentService = Provider.of<DocumentService>(context, listen: false);
-      
+      final documentService =
+          Provider.of<DocumentService>(context, listen: false);
+
       final result = await documentService.verifyToken(token);
-      
+
       if (result['expired'] == true) {
         setState(() {
           _errorMessage = 'Token ini telah kedaluwarsa';
@@ -80,14 +81,14 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
 
   String _formatExpiryTime() {
     if (_expiryTime == null) return '';
-    
+
     final now = DateTime.now();
     final difference = _expiryTime!.difference(now);
-    
+
     if (difference.isNegative) {
       return 'Kedaluwarsa';
     }
-    
+
     if (difference.inHours > 0) {
       return '${difference.inHours}j ${difference.inMinutes % 60}m tersisa';
     } else if (difference.inMinutes > 0) {
@@ -209,19 +210,19 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
                 ),
               ),
             ),
-            
+
             if (_isVerified && _verificationData != null) ...[
               const SizedBox(height: 24),
-              
+
               // Verification status
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.green.withOpacity(0.3),
+                    color: Colors.green.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -230,7 +231,7 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.2),
+                        color: Colors.green.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -273,9 +274,9 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Document information
               const Text(
                 'Informasi Dokumen',
@@ -285,7 +286,7 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Document card
               if (_verificationData!.containsKey('document_type') ||
                   _verificationData!.containsKey('document_name')) ...[
@@ -302,11 +303,13 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
                             width: 60,
                             height: 60,
                             decoration: BoxDecoration(
-                              color: AppTheme.primaryColor.withOpacity(0.1),
+                              color:
+                                  AppTheme.primaryColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
-                              _getDocumentIcon(_verificationData!['document_type']),
+                              _getDocumentIcon(
+                                  _verificationData!['document_type']),
                               color: AppTheme.primaryColor,
                               size: 32,
                             ),
@@ -316,7 +319,8 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (_verificationData!.containsKey('document_name'))
+                              if (_verificationData!
+                                  .containsKey('document_name'))
                                 Text(
                                   _verificationData!['document_name'],
                                   style: const TextStyle(
@@ -324,10 +328,12 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
                                     fontSize: 16,
                                   ),
                                 ),
-                              if (_verificationData!.containsKey('document_type')) ...[
+                              if (_verificationData!
+                                  .containsKey('document_type')) ...[
                                 const SizedBox(height: 4),
                                 Text(
-                                  DocumentType.getDisplayName(_verificationData!['document_type']),
+                                  DocumentType.getDisplayName(
+                                      _verificationData!['document_type']),
                                   style: TextStyle(
                                     color: Colors.grey[600],
                                     fontSize: 14,
@@ -342,80 +348,19 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
                   ),
                 ),
               ],
-              
+
               const SizedBox(height: 24),
-              
+
               // Metadata
-              final fieldsToDisplay = _verificationData!.entries.where((entry) =>
-                  entry.key != 'document_type' &&
-                  entry.key != 'document_name').toList();
-              
-              if (fieldsToDisplay.isNotEmpty) ...[
-                const Text(
-                  'Data Dokumen',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: fieldsToDisplay.length,
-                    separatorBuilder: (context, index) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final entry = fieldsToDisplay[index];
-                      
-                      // Format field name for display
-                      String displayName = entry.key.replaceAll('_', ' ');
-                      displayName = displayName[0].toUpperCase() + displayName.substring(1);
-                      
-                      return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                displayName,
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              flex: 3,
-                              child: Text(
-                                entry.value.toString(),
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-              
+              ..._buildMetadataSection(),
+
               const SizedBox(height: 32),
-              
+
               // Disclaimer
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.05),
+                  color: Colors.blue.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -456,4 +401,79 @@ class _VerifyDocumentScreenState extends State<VerifyDocumentScreen> {
       ),
     );
   }
-} 
+
+  List<Widget> _buildMetadataSection() {
+    if (_verificationData == null) {
+      return [];
+    }
+
+    final fieldsToDisplay = _verificationData!.entries
+        .where((entry) =>
+            entry.key != 'document_type' && entry.key != 'document_name')
+        .toList();
+
+    if (fieldsToDisplay.isEmpty) {
+      return [];
+    }
+
+    return [
+      const Text(
+        'Data Dokumen',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      ),
+      const SizedBox(height: 16),
+      Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: fieldsToDisplay.length,
+          separatorBuilder: (context, index) => const Divider(height: 1),
+          itemBuilder: (context, index) {
+            final entry = fieldsToDisplay[index];
+
+            // Format field name for display
+            String displayName = entry.key.replaceAll('_', ' ');
+            displayName =
+                displayName[0].toUpperCase() + displayName.substring(1);
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      displayName,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      entry.value.toString(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    ];
+  }
+}

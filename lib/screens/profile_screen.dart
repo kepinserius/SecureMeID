@@ -17,32 +17,33 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = false;
   int _trusteedContactsCount = 0;
-  
+
   @override
   void initState() {
     super.initState();
     _loadTrustedContacts();
   }
-  
+
   Future<void> _loadTrustedContacts() async {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
-      final blockchainService = Provider.of<BlockchainService>(context, listen: false);
-      
+      final blockchainService =
+          Provider.of<BlockchainService>(context, listen: false);
+
       if (authService.walletAddress != null) {
         final trustedContacts = await blockchainService.getTrustedContacts(
           authService.walletAddress!,
         );
-        
+
         setState(() {
           _trusteedContactsCount = trustedContacts.length;
         });
       }
-      
+
       setState(() {
         _isLoading = false;
       });
@@ -52,7 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
   }
-  
+
   void _copyToClipboard(String text) {
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -62,17 +63,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-  
+
   void _logout() async {
     final authService = Provider.of<AuthService>(context, listen: false);
     authService.logout();
-    
+
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
     );
   }
-  
+
   void _navigateToTrustedContacts() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const TrustedContactsScreen()),
@@ -83,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     final walletAddress = authService.walletAddress ?? 'Not available';
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -118,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 32),
-          
+
           // Wallet information
           Text(
             'Wallet Information',
@@ -137,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             icon: Icons.account_balance,
           ),
           const SizedBox(height: 32),
-          
+
           // Security
           Text(
             'Security',
@@ -169,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
           ),
           const SizedBox(height: 32),
-          
+
           // Account
           Text(
             'Account',
@@ -203,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
           ),
           const SizedBox(height: 32),
-          
+
           // Logout button
           SizedBox(
             width: double.infinity,
@@ -221,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-  
+
   Widget _buildInfoCard({
     required String title,
     required String value,
@@ -279,7 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-  
+
   Widget _buildActionCard({
     required String title,
     required String description,
@@ -293,7 +294,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+          backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.1),
           child: Icon(
             icon,
             color: AppTheme.primaryColor,
@@ -317,4 +318,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-} 
+}

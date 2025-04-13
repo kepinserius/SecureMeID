@@ -29,6 +29,8 @@ class AuthService extends ChangeNotifier {
   String? get userId => _userId;
   String? get walletAddress => _userWalletAddress;
   String? get publicKey => _userPublicKey;
+  String? get privateKey =>
+      '0x123456789abcdef'; // Dummy private key for development, jangan gunakan di production
 
   AuthService() {
     _checkIfUserIsLoggedIn();
@@ -117,9 +119,10 @@ class AuthService extends ChangeNotifier {
     final address = privateKey.address.hexEip55;
 
     // Encrypt the private key and mnemonic with the PIN
-    final encryptedMnemonic = _encryptionService.encryptData(mnemonic, pin);
+    final encryptedMnemonic =
+        await _encryptionService.encryptData(mnemonic, pin);
     final encryptedPrivateKey =
-        _encryptionService.encryptData(bytesToHex(masterKey.key), pin);
+        await _encryptionService.encryptData(bytesToHex(masterKey.key), pin);
 
     // Create a unique user ID
     final userId = const Uuid().v4();
@@ -163,7 +166,7 @@ class AuthService extends ChangeNotifier {
 
       // Try to decrypt the private key with the PIN
       try {
-        _encryptionService.decryptData(encryptedPrivateKey, pin);
+        await _encryptionService.decryptData(encryptedPrivateKey, pin);
 
         // If decryption succeeded, set user as logged in
         _userId = userId;
@@ -201,6 +204,7 @@ class AuthService extends ChangeNotifier {
           return true;
         }
       }
+
       return false;
     } catch (e) {
       return false;
@@ -253,9 +257,9 @@ class AuthService extends ChangeNotifier {
 
       // Encrypt the private key and mnemonic with the new PIN
       final encryptedMnemonic =
-          _encryptionService.encryptData(mnemonic, newPin);
-      final encryptedPrivateKey =
-          _encryptionService.encryptData(bytesToHex(masterKey.key), newPin);
+          await _encryptionService.encryptData(mnemonic, newPin);
+      final encryptedPrivateKey = await _encryptionService.encryptData(
+          bytesToHex(masterKey.key), newPin);
 
       // Create a unique user ID
       final userId = const Uuid().v4();

@@ -13,26 +13,30 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  
+
   final List<OnboardingPage> _pages = [
     OnboardingPage(
       title: 'Secure Identity Storage',
-      description: 'Store your identity documents securely using advanced encryption and blockchain technology.',
+      description:
+          'Store your identity documents securely using advanced encryption and blockchain technology.',
       image: Icons.security,
     ),
     OnboardingPage(
       title: 'Biometric Protection',
-      description: 'Access your documents only with your fingerprint or facial recognition.',
+      description:
+          'Access your documents only with your fingerprint or facial recognition.',
       image: Icons.fingerprint,
     ),
     OnboardingPage(
       title: 'Selective Disclosure',
-      description: 'Share only the information you want during KYC verification without revealing your entire document.',
+      description:
+          'Share only the information you want during KYC verification without revealing your entire document.',
       image: Icons.visibility,
     ),
     OnboardingPage(
       title: 'Trusted Recovery',
-      description: 'Recover your identity through trusted contacts with our multi-signature system.',
+      description:
+          'Recover your identity through trusted contacts with our multi-signature system.',
       image: Icons.people,
     ),
   ];
@@ -63,7 +67,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
             ),
-            
+
             // Page view
             Expanded(
               child: PageView.builder(
@@ -79,7 +83,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             ),
-            
+
             // Dots indicator
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -93,12 +97,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     shape: BoxShape.circle,
                     color: _currentPage == index
                         ? AppTheme.primaryColor
-                        : Colors.grey.withOpacity(0.5),
+                        : Colors.grey.withValues(alpha: 0.5),
                   ),
                 ),
               ),
             ),
-            
+
             // Navigation buttons
             Padding(
               padding: const EdgeInsets.all(20.0),
@@ -123,7 +127,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         )
                       : const SizedBox(width: 80),
-                  
+
                   // Next/Get Started button
                   ElevatedButton(
                     onPressed: () {
@@ -170,7 +174,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withOpacity(0.1),
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -180,7 +184,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 40),
-          
+
           // Title
           Text(
             page.title,
@@ -188,7 +192,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
-          
+
           // Description
           Text(
             page.description,
@@ -230,7 +234,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          
+
           // Register button
           SizedBox(
             width: double.infinity,
@@ -254,7 +258,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          
+
           // Login button
           SizedBox(
             width: double.infinity,
@@ -292,4 +296,4 @@ class OnboardingPage {
     required this.description,
     required this.image,
   });
-} 
+}

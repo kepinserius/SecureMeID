@@ -20,26 +20,27 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedTabIndex = 0;
   bool _isLoading = false;
   String _selectedDocumentType = 'all';
-  
+
   @override
   void initState() {
     super.initState();
     _refreshDocuments();
   }
-  
+
   Future<void> _refreshDocuments() async {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
-      final documentService = Provider.of<DocumentService>(context, listen: false);
-      
+      final documentService =
+          Provider.of<DocumentService>(context, listen: false);
+
       if (authService.walletAddress != null) {
         await documentService.syncWithBlockchain(authService.walletAddress!);
       }
-      
+
       setState(() {
         _isLoading = false;
       });
@@ -49,19 +50,19 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
   }
-  
+
   void _onTabSelected(int index) {
     setState(() {
       _selectedTabIndex = index;
     });
   }
-  
+
   void _addNewDocument() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const AddDocumentScreen()),
     );
   }
-  
+
   void _openDocumentDetails(Document document) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   void _selectDocumentType(String type) {
     setState(() {
       _selectedDocumentType = type;
@@ -123,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
           : null,
     );
   }
-  
+
   Widget _buildBody() {
     switch (_selectedTabIndex) {
       case 0:
@@ -136,10 +137,10 @@ class _HomeScreenState extends State<HomeScreen> {
         return _buildHomeTab();
     }
   }
-  
+
   Widget _buildHomeTab() {
     final authService = Provider.of<AuthService>(context);
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -207,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          
+
           // Quick actions
           Text(
             'Quick Actions',
@@ -241,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          
+
           // Recent documents
           Text(
             'Recent Documents',
@@ -253,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   Widget _buildActionCard({
     required IconData icon,
     required String label,
@@ -292,17 +293,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   Widget _buildRecentDocuments() {
     final documentService = Provider.of<DocumentService>(context);
     final documents = documentService.documents;
-    
+
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
-    
+
     if (documents.isEmpty) {
       return Card(
         elevation: 1,
@@ -340,10 +341,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     }
-    
+
     // Show at most 3 recent documents
     final recentDocs = documents.take(3).toList();
-    
+
     return Column(
       children: [
         ...recentDocs.map((doc) => _buildDocumentCard(doc)),
@@ -359,16 +360,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
-  
+
   Widget _buildDocumentsTab() {
     final documentService = Provider.of<DocumentService>(context);
     List<Document> documents = documentService.documents;
-    
+
     // Filter documents by type if needed
     if (_selectedDocumentType != 'all') {
-      documents = documents.where((doc) => doc.type == _selectedDocumentType).toList();
+      documents =
+          documents.where((doc) => doc.type == _selectedDocumentType).toList();
     }
-    
+
     return Column(
       children: [
         // Document type filter chips
@@ -386,7 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        
+
         // Documents list
         Expanded(
           child: _isLoading
@@ -407,10 +409,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
-  
+
   Widget _buildFilterChip(String type, String label) {
     final isSelected = _selectedDocumentType == type;
-    
+
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: FilterChip(
@@ -420,7 +422,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _selectDocumentType(type);
         },
         backgroundColor: Colors.grey[200],
-        selectedColor: AppTheme.primaryColor.withOpacity(0.2),
+        selectedColor: AppTheme.primaryColor.withValues(alpha: 0.2),
         checkmarkColor: AppTheme.primaryColor,
         labelStyle: TextStyle(
           color: isSelected ? AppTheme.primaryColor : Colors.black,
@@ -429,7 +431,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   Widget _buildEmptyDocumentsList() {
     return Center(
       child: Column(
@@ -463,10 +465,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   Widget _buildDocumentCard(Document document) {
     final String documentTypeName = DocumentType.getDisplayName(document.type);
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -485,7 +487,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryColor.withOpacity(0.1),
+                  color: AppTheme.primaryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -494,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Document info
               Expanded(
                 child: Column(
@@ -525,7 +527,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              
+
               // Verification status
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -534,8 +536,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 decoration: BoxDecoration(
                   color: document.isVerified
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.orange.withOpacity(0.1),
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -553,7 +555,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-  
+
   IconData _getDocumentIcon(String documentType) {
     switch (documentType) {
       case DocumentType.idCard:
@@ -582,11 +584,11 @@ class _HomeScreenState extends State<HomeScreen> {
         return Icons.description;
     }
   }
-  
+
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays < 1) {
       return 'Today';
     } else if (difference.inDays < 2) {
@@ -597,4 +599,4 @@ class _HomeScreenState extends State<HomeScreen> {
       return '${date.day}/${date.month}/${date.year}';
     }
   }
-} 
+}

@@ -13,67 +13,68 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settingsBox = Hive.box('settings');
-  
+
   bool _useBiometrics = true;
   bool _autoLock = true;
   int _autoLockTime = 5; // minutes
   bool _notificationsEnabled = true;
   bool _darkMode = false;
-  
+
   @override
   void initState() {
     super.initState();
     _loadSettings();
   }
-  
+
   void _loadSettings() {
     setState(() {
       _useBiometrics = _settingsBox.get('useBiometrics', defaultValue: true);
       _autoLock = _settingsBox.get('autoLock', defaultValue: true);
       _autoLockTime = _settingsBox.get('autoLockTime', defaultValue: 5);
-      _notificationsEnabled = _settingsBox.get('notificationsEnabled', defaultValue: true);
+      _notificationsEnabled =
+          _settingsBox.get('notificationsEnabled', defaultValue: true);
       _darkMode = _settingsBox.get('darkMode', defaultValue: false);
     });
   }
-  
+
   Future<void> _saveSetting(String key, dynamic value) async {
     await _settingsBox.put(key, value);
   }
-  
+
   Future<void> _toggleBiometrics(bool value) async {
     setState(() {
       _useBiometrics = value;
     });
     await _saveSetting('useBiometrics', value);
   }
-  
+
   Future<void> _toggleAutoLock(bool value) async {
     setState(() {
       _autoLock = value;
     });
     await _saveSetting('autoLock', value);
   }
-  
+
   Future<void> _setAutoLockTime(int minutes) async {
     setState(() {
       _autoLockTime = minutes;
     });
     await _saveSetting('autoLockTime', minutes);
   }
-  
+
   Future<void> _toggleNotifications(bool value) async {
     setState(() {
       _notificationsEnabled = value;
     });
     await _saveSetting('notificationsEnabled', value);
   }
-  
+
   Future<void> _toggleDarkMode(bool value) async {
     setState(() {
       _darkMode = value;
     });
     await _saveSetting('darkMode', value);
-    
+
     // In a real app, you would update the ThemeMode here
   }
 
@@ -81,7 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
     final canUseBiometrics = authService.isBiometricsAvailable();
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -90,7 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         future: canUseBiometrics,
         builder: (context, snapshot) {
           final biometricsAvailable = snapshot.data ?? false;
-          
+
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -99,7 +100,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               if (biometricsAvailable)
                 _buildSwitchTile(
                   title: 'Use Biometric Authentication',
-                  subtitle: 'Use fingerprint or face recognition for quick access',
+                  subtitle:
+                      'Use fingerprint or face recognition for quick access',
                   value: _useBiometrics,
                   onChanged: _toggleBiometrics,
                   icon: Icons.fingerprint,
@@ -117,16 +119,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   value: _autoLockTime,
                   items: const [1, 5, 10, 15, 30],
                   labelBuilder: (value) => '$value minutes',
-                  onChanged: (value) {
+                  onChanged: (int? value) {
                     if (value != null) {
                       _setAutoLockTime(value);
                     }
                   },
                   icon: Icons.timer,
                 ),
-              
+
               const Divider(),
-              
+
               // Appearance section
               _buildSectionHeader('Appearance'),
               _buildSwitchTile(
@@ -136,9 +138,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onChanged: _toggleDarkMode,
                 icon: Icons.dark_mode,
               ),
-              
+
               const Divider(),
-              
+
               // Notifications section
               _buildSectionHeader('Notifications'),
               _buildSwitchTile(
@@ -148,9 +150,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onChanged: _toggleNotifications,
                 icon: Icons.notifications,
               ),
-              
+
               const Divider(),
-              
+
               // Data management section
               _buildSectionHeader('Data Management'),
               _buildActionTile(
@@ -160,7 +162,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () {
                   _showConfirmationDialog(
                     title: 'Clear Cache',
-                    message: 'Are you sure you want to clear the cache? This won\'t delete your documents.',
+                    message:
+                        'Are you sure you want to clear the cache? This won\'t delete your documents.',
                     onConfirm: () {
                       // Clear cache logic
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -178,9 +181,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // Export data logic
                 },
               ),
-              
+
               const Divider(),
-              
+
               // About section
               _buildSectionHeader('About'),
               _buildInfoTile(
@@ -210,7 +213,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 8),
@@ -222,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Widget _buildSwitchTile({
     required String title,
     required String subtitle,
@@ -241,7 +244,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Widget _buildDropdownTile<T>({
     required String title,
     required T value,
@@ -265,7 +268,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Widget _buildActionTile({
     required String title,
     required String subtitle,
@@ -280,7 +283,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onTap: onTap,
     );
   }
-  
+
   Widget _buildInfoTile({
     required String title,
     required String value,
@@ -297,7 +300,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-  
+
   Future<void> _showConfirmationDialog({
     required String title,
     required String message,
@@ -328,4 +331,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
     );
   }
-} 
+}

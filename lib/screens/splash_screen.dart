@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:secureme_id/screens/onboarding_screen.dart';
 import 'package:secureme_id/screens/home_screen.dart';
@@ -14,19 +13,20 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     );
-    
+
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
@@ -34,13 +34,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       parent: _animationController,
       curve: Curves.easeIn,
     ));
-    
+
     _animationController.forward();
-    
+
     // Check if user is already logged in
     Timer(const Duration(seconds: 3), () {
       final authService = Provider.of<AuthService>(context, listen: false);
-      
+
       if (authService.isUserLoggedIn()) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       }
     });
   }
-  
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         spreadRadius: 2,
                       ),
@@ -105,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 Text(
                   'Your Identity, Secured',
                   style: AppTheme.bodyStyle.copyWith(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 16,
                   ),
                 ),
@@ -114,7 +114,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   width: 40,
                   height: 40,
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.9)),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white.withValues(alpha: 0.9)),
                     strokeWidth: 3,
                   ),
                 ),
@@ -125,4 +126,4 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       ),
     );
   }
-} 
+}

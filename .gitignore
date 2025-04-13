@@ -19,7 +19,7 @@ migrate_working_dir/
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
-#.vscode/
+.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -101,20 +101,79 @@ keys/
 private_key.pem
 identity.pem
 .env.local
+.env.development
+.env.production
+.env.test
+**/wallet_keys/
+**/credentials/
 
 # JS build artifacts
 /assets/js/node_modules/
 /assets/js/dist/
 /assets/js/build/
+/node_modules/
 
 # Local test data
 .test_data/
+/test_data/
+/mock_data/
 
 # Generated files
 *.g.dart
 *.freezed.dart
 *.mocks.dart
+*.config.dart
 
 # Hive
 *.hive
-*.lock 
+*.lock
+
+# Secure storage and cache
+**/.secure_storage/
+**/.cached_data/
+**/secure_preferences/
+**/hive-data/
+.hive/
+
+# Firebase config
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# Binary files and database
+*.db
+*.sqlite
+*.sqlite3
+
+# Certificate files and keystores
+*.jks
+*.keystore
+*.p12
+*.der
+*.cer
+*.crt
+*.pem
+**/certificates/
+
+# Logs
+**/logs/
+log.txt
+*.log.*
+
+# IDE specific files
+.classpath
+.project
+.settings/
+.vscode/launch.json
+.vscode/settings.json
+
+# Platform specific
+/windows/
+/macos/
+/linux/
+/web/
+
+# User-specific files
+.secrets
+auth_tokens.json
+credentials.json 
